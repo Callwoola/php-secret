@@ -1,0 +1,14 @@
+{
+    "name": "callwoola/secret",
+    "description": "simple secret message solution。",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Neo",
+            "email": "call@woola.net"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {}
+}
