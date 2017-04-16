@@ -9,6 +9,14 @@
             "email": "call@woola.net"
         }
     ],
-    "minimum-stability": "dev",
-    "require": {}
+    "require": {},
+    "require-dev": {
+        "phpunit/phpunit": "^6.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Secret\\": "src/"
+        }
+    },
+    "minimum-stability": "dev"
 }
