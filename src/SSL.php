@@ -15,6 +15,11 @@ class SSL
 
     public static function decode($encrypted)
     {
+
+        if (!strlen(self::$privateKey) > 0) {
+            throw new \RuntimeException('Private was empty.');
+        }
+
         // decode
         $keyStr = self::$privateKey;
 
@@ -48,6 +53,10 @@ class SSL
 
     public static function encode($data = [])
     {
+        if (!strlen(self::$publicKey) > 0) {
+            throw new \RuntimeException('Public was empty.');
+        }
+
         $plain = gzcompress($data); // compress data
         $publicString = self::$publicKey;
 
@@ -90,10 +99,8 @@ class SSL
     public static function attireIn($string, $isPub = true)
     {
         $title = $isPub ? 'PUBLIC' : 'PRIVATE';
-
-        $string = @preg_replace("/\r|\n/", '', $string);
+        $string = chunk_split($string, 64);
         $string = '-----BEGIN ' . $title . ' KEY-----' . $string . '-----END ' . $title . ' KEY-----';
-
         return $string;
     }
 
@@ -118,5 +125,11 @@ class SSL
     public static function generateAppId()
     {
         return (string)(date('Ymdhms') . '' . dechex(rand(1, 10 ** 12)));
+    }
+
+    public static function destroy()
+    {
+        self::$publicKey = '';
+        self::$privateKey = '';
     }
 }
