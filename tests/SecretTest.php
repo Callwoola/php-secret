@@ -3,37 +3,53 @@ use PHPUnit\Framework\TestCase;
 
 class SecretTest extends TestCase
 {
-    public function testBase()
+
+    public $clientConfig = [
+        'app_id' => 'mock id',
+        'secret_key' => '',
+        'self_ssl_file' => __DIR__ . '/tmp/client_ssl',
+    ];
+
+    public $serverConfig = [
+        'self_ssl_file' => __DIR__ . '/tmp/server_ssl',
+    ];
+
+    public function award()
     {
-        $this->assertEmpty([]);
+        $server = new \Secret\Server($this->serverConfig);
+
+        $result = $server->generate();
+
+        return $result;
     }
 
-    //public function testGetKey()
-    //{
-    //    $s = new \Secret\Server();
-    //    $secretKey = $s->generate();
-    //
-    //    $this->assertTrue(true);
-    //}
-
-    public function testEncodeAndDecode()
+    public function testUnit()
     {
-        $s = new \Secret\SSL();
-
-        $encodingString = $s->encode(
-            json_encode(
-                [
-                    'mock',
-                    'mock',
-                ]
-            )
+        $sendData = json_encode(
+            [
+                'mock',
+                'mock_test',
+            ]
         );
 
-        $result = $s->decode($encodingString);
-        var_dump(
-            json_decode($result)
-        );
+        $award = $this->award();
+        $this->clientConfig['secret_key'] = $award['PBK'];
+        $this->clientConfig['app_id'] = $award['app_id'];
 
-        $this->assertTrue(true);
+        $client = new \Secret\Client($this->clientConfig);
+        $transfer = $client->encode($sendData);
+
+        $result = $this->server($transfer);
+        $result = $client->decode($result);
+
+        $this->assertEquals($result, $sendData);
+    }
+
+    public function server($data)
+    {
+        $server = new \Secret\Server($this->serverConfig);
+        $decode = $server->decode($data);
+
+        return $server->revert($decode['data']);
     }
 }

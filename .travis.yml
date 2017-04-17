@@ -13,10 +13,6 @@ before_script:
   - composer install
 
 script:
-  - ./vendor/bin/phpunit --coverage-clover ./clover.xml --testsuite=unit
-  - ./vendor/bin/phpunit test/functional
-#  - if php -i |grep -qE xdebug; then ./vendor/bin/humbug --options='--testsuite=unit'; fi
+  - ./vendor/bin/phpunit
 
 after_script:
-  - wget https://scrutinizer-ci.com/ocular.phar
-  - if [ -f clover.xml ]; then php ocular.phar code-coverage:upload --format=php-clover ./clover.xml; fi

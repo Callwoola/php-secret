@@ -15,7 +15,6 @@ class SSL
 
     public static function decode($encrypted)
     {
-
         if (!strlen(self::$privateKey) > 0) {
             throw new \RuntimeException('Private was empty.');
         }
@@ -27,7 +26,7 @@ class SSL
             throw new \RuntimeException('get private key failed' . "\n");
         }
 
-        echo 'encrypted data: ' . $encrypted;
+        // echo 'encrypted data: ' . $encrypted;
 
         $encrypted = base64_decode($encrypted);
 
@@ -100,13 +99,22 @@ class SSL
     {
         $title = $isPub ? 'PUBLIC' : 'PRIVATE';
         $string = chunk_split($string, 64);
-        $string = '-----BEGIN ' . $title . ' KEY-----' . $string . '-----END ' . $title . ' KEY-----';
+        $string = '-----BEGIN ' . $title . ' KEY-----' . PHP_EOL . $string . '-----END ' . $title . ' KEY-----';
+
         return $string;
     }
 
-    public static function generate()
+    public static function generate($PVK = null)
     {
-        $privateKey = openssl_pkey_new();
+        $privateKey = null;
+
+        if (!isset($PVK)) {
+            $privateKey = openssl_pkey_new();
+        } else {
+            $privateKey = openssl_pkey_get_private($PVK);
+        }
+
+        if (!is_resource($privateKey)) throw new \RuntimeException('Private not a resource.');
 
         $key = openssl_pkey_get_details($privateKey);
         openssl_pkey_export($privateKey, $privateKeyString);
